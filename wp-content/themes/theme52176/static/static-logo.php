@@ -8,7 +8,7 @@
 					<h2 class="logo_h logo_h__txt"><a href="<?php echo home_url(); ?>/" title="<?php bloginfo('description'); ?>" class="logo_link"><?php bloginfo('name'); ?></a></h2>
 			<?php } ?>
 
-			<?php 
+			<?php
 				$tagline = get_bloginfo('description');
 				if ( $tagline!='' ) {
 			?>
@@ -17,10 +17,10 @@
 
 	<?php } else { ?>
 			<?php if(of_get_option('logo_url') == ''){ ?>
-					<a href="<?php echo home_url(); ?>/" class="logo_h logo_h__img"><img src="<?php echo get_stylesheet_directory_uri(); ?>/images/logo.png" alt="<?php bloginfo('name'); ?>" title="<?php bloginfo('description'); ?>"></a>
+					<a href="<?php echo home_url(); ?>/" class="logo_h logo_h__img"><img src="<?php echo get_stylesheet_directory_uri(); ?>/images/logo.png" alt="<?php bloginfo('name'); ?>" style="height:140px;" title="<?php bloginfo('description'); ?>"></a>
 			<?php } else  { ?>
-					<a href="<?php echo home_url(); ?>/" class="logo_h logo_h__img"><img src="<?php echo of_get_option('logo_url', '' ); ?>" alt="<?php bloginfo('name'); ?>" title="<?php bloginfo('description'); ?>"></a>
+					<a href="<?php echo home_url(); ?>/" class="logo_h logo_h__img"><img src="<?php echo of_get_option('logo_url', '' ); ?>" alt="<?php bloginfo('name'); ?>" style="height:140px;" title="<?php bloginfo('description'); ?>"></a>
 			<?php }?>
-	<?php } ?>	
+	<?php } ?>
 </div>
 <!-- END LOGO -->

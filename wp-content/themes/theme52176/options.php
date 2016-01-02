@@ -375,19 +375,19 @@ if(!function_exists('optionsframework_options')) {
 // ---------------------------------------------------------
 // Contacts
 // ---------------------------------------------------------
-			$options[] = array( 
+			$options[] = array(
 								"name" => __("Contacts", CURRENT_THEME),
 								"type" => "heading");
-			
-			$options['phone'] = array( 
+
+			$options['phone'] = array(
 								"name" => __("Phone", CURRENT_THEME),
 								"desc" => __("Phone. HTML tags are allowed.", CURRENT_THEME),
 								"id" => "phone",
 								"std" => "Phone: <br>
 +1 959 603 6035 (585-adoption)",
-								"type" => "textarea");					
-								
-			$options['location'] = array( 
+								"type" => "textarea");
+
+			$options['location'] = array(
 								"name" => __("Location", CURRENT_THEME),
 								"desc" => __("Location. HTML tags are allowed.", CURRENT_THEME),
 								"id" => "location",
@@ -399,25 +399,25 @@ Glasgow, DO4 89GR.",
 // ---------------------------------------------------------
 // Social
 // ---------------------------------------------------------
-			$options[] = array( 
+			$options[] = array(
 								"name" => __("Social", CURRENT_THEME),
 								"type" => "heading");
 
-			$options['twitter'] = array( 
+			$options['twitter'] = array(
 								"name" => "Twitter URL",
 								"desc" => "Twitter URL",
 								"id" => "twitter",
 								"std" => "#",
 								"type" => "text");
-			
-			$options['facebook'] = array( 
+
+			$options['facebook'] = array(
 								"name" => "Facebook URL",
 								"desc" => "Facebook URL",
 								"id" => "facebook",
 								"std" => "#",
-								"type" => "text");			
+								"type" => "text");
 
-			$options['google-plus'] = array( 
+			$options['google-plus'] = array(
 								"name" => "Google+ URL",
 								"desc" => "Google+ URL",
 								"id" => "google-plus",
@@ -428,25 +428,25 @@ Glasgow, DO4 89GR.",
 // Map
 // ---------------------------------------------------------
 
-			$options[] = array( 
+			$options[] = array(
 								"name" => __("Map", CURRENT_THEME),
 								"type" => "heading");
 
-			$options['latitude'] = array( 
+			$options['latitude'] = array(
 								"name" => __("Map Latitude", CURRENT_THEME),
 								"desc" => __("Map Latitude", CURRENT_THEME),
 								"id" => "latitude",
 								"std" => "31.990687",
-								"type" => "text");	
+								"type" => "text");
 
-			$options['longitude'] = array( 
+			$options['longitude'] = array(
 								"name" => __("Map Longitude", CURRENT_THEME),
 								"desc" => __("Map Longitude", CURRENT_THEME),
 								"id" => "longitude",
 								"std" => "-81.047177",
-								"type" => "text");				
+								"type" => "text");
 
-			$options['zoom'] = array( 
+			$options['zoom'] = array(
 								"name" => __("Map Zoom", CURRENT_THEME),
 								"desc" => __("Map Zoom", CURRENT_THEME),
 								"id" => "zoom",
