@@ -1,0 +1,329 @@
+.parallax-slider{
+	position: relative;
+	width: 100%;
+	height: 608px;
+	display: block;
+	overflow: hidden;
+	top: 0;
+	left: 0;
+	-ms-transform: translateZ(0);
+	transform: translateZ(0);
+
+	@media (min-width: 1200px) {
+		height: 581px;
+	}
+	@media (min-width: 768px) and (max-width: 979px) {
+		height: 400px;
+	}
+	@media (max-width: 767px) {
+		height: 400px;
+	}
+	@media (max-width: 480px) {
+		height: 300px;
+	}
+		.baseList{
+			display: none;
+		}
+		#mainImageHolder{
+			position: relative;
+			width: 100%;
+			height: 165%;
+			top: 0;
+			z-index: 1;
+				.primaryHolder{
+					position: absolute;
+					width: 100%;
+					height: 100%;
+					top: 0;
+					left: 0;
+					z-index: 2;
+						img{
+							position: absolute;
+							max-width: inherit;
+						}
+				}
+				.secondaryHolder{
+					position: absolute;
+					width: 100%;
+					height: 100%;
+					top: 0px;
+					left: 0px;
+					z-index: 1;
+						img{
+							position: absolute;
+							max-width: inherit;
+						}
+				}
+		}
+		#mainCaptionHolder{
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			bottom: 0;
+			left: 0;
+			z-index: 2;			
+			cursor: pointer;			
+
+				.container{
+					position: relative;
+					height: 100%;						
+				}
+				.slider_caption {
+					padding: 14px 0 15px 83px;	
+
+					@media (max-width: 480px) {
+						padding-left: 20px;
+						padding-right: 20px;
+						text-align: center;
+					}
+				}
+				.primaryCaption{
+					position: absolute;
+					bottom: 0;
+					width: 100%;
+					background: rgb(0, 0, 0, 0.125);
+
+					.no-rgba & {
+						background-image: url(images/black-opacity-13.png);
+					}
+				}
+				.secondaryCaption{
+					position: absolute;
+					bottom: 0;
+					width: 100%;
+					background: rgb(0, 0, 0, 0.125);
+
+					.no-rgba & {
+						background-image: url(images/black-opacity-13.png);
+					}
+				}
+				h2{
+					font-size: 18px;
+					font-weight: 300 !important; 
+					line-height: 1.2em;
+					color: @white;							
+					margin: 0;
+				}
+				h3{
+					font-size: 40px;
+					line-height: 40px;
+					color: #fff;
+					font-weight: bold;
+					text-transform: uppercase;
+					margin-bottom: 25px;
+				}
+				p{
+					font-size: 20px;
+					line-height: 28px;
+					color: #fff;
+					margin-bottom: 30px;
+				}
+				.morebtn{
+					font-size: 20px;
+					line-height: 28px;
+					color: #fff;
+					padding: 8px 14px;
+					border: 2px solid #fff;
+					background: #08C;
+					.transition(all 0.5s ease);
+						&:hover{
+							text-decoration: none;
+							background: #363636;
+						}
+				}
+		}
+		&.zoom-fade-eff{
+			#mainImageHolder{
+				.primaryHolder{
+					.opacity(100);
+					.scale(1);
+						&.animateState{
+							.opacity(0);
+							.scale(3);
+						}
+				}
+				.secondaryHolder{
+					.opacity(100);
+						&.animateState{
+							.opacity(0);
+						}
+				}
+			}
+			#mainCaptionHolder{
+				.primaryCaption{
+					.opacity(100);
+						&.animateState{
+							.opacity(0);
+						}
+				}
+				.secondaryCaption{
+					.opacity(100);
+						&.animateState{
+							.opacity(0);
+						}
+				}
+			}
+		}
+		&.simple-fade-eff{
+			#mainImageHolder{
+				.primaryHolder{
+					.opacity(100);
+						&.animateState{
+							.opacity(0);
+						}
+				}
+				.secondaryHolder{
+					&.animateState{
+						.opacity(100);
+							&.animateState{
+								.opacity(0);
+							}
+					}
+				}
+			}
+			#mainCaptionHolder{
+				.primaryCaption{
+					.opacity(100);
+						&.animateState{
+							.opacity(0);
+						}
+				}
+				.secondaryCaption{
+					.opacity(100);
+						&.animateState{
+							.opacity(0);
+						}
+				}
+			}
+		}
+		&.slide-top-eff{
+			#mainImageHolder{
+				.primaryHolder{
+					top: 0;
+						&.animateState{
+							top: -100%;
+						}
+				}
+				.secondaryHolder{
+					&.animateState{
+						top: 0;
+							&.animateState{
+								top: 100%;
+							}
+					}
+				}
+			}
+			#mainCaptionHolder{
+				.primaryCaption{
+					.opacity(100);
+					.scale(1);
+						&.animateState{
+							.opacity(0);
+						}
+				}
+				.secondaryCaption{
+					.opacity(100);
+						&.animateState{
+							.opacity(0);
+						}
+				}
+			}
+		}
+		.controlWrap {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+
+			@media (max-width: 480px) {
+				bottom: 43%;
+			}
+
+			.container {
+				position: relative;
+			}
+		}
+		.controlBtn{
+			display: block;
+			position: absolute;
+			bottom: -3px;
+			cursor: pointer;
+			z-index: 3;
+
+			.innerBtn{
+				font-size: 56px;
+				line-height: 1em;
+				text-align: center;
+				color: @linkColor;
+				display: block;
+				position: relative;
+				z-index: 1;
+				.transition(all 0.3s ease);
+			}
+			&:hover {
+				.innerBtn {
+					color: #9d9c9b;
+				}
+			}
+			.slidesCounter{					
+				display: none;
+			}
+			&.parallaxPrevBtn{
+				left: 28px;					
+
+				@media (max-width: 480px) {
+					left: 10px;
+				}
+			}
+			&.parallaxNextBtn{
+				left: 51px;		
+
+				@media (max-width: 480px) {
+					left: auto;
+					right: 10px;
+				}			
+			}
+		}
+		#paralaxSliderPagination{
+			position: absolute;
+			bottom: 17px;
+			width: 100%;
+			height: 14px;
+			text-align: right;
+			z-index: 2;
+				ul{
+					list-style: none;
+					margin: 0;
+						li{
+							width: 10px;
+							height: 10px;
+							display: inline-block;
+							vertical-align: top;
+							margin: 0 3px;
+							border-radius: 10px;
+							border: 2px solid @linkColor;
+							cursor: pointer;
+							.transition(all 0.5s ease);
+								&:hover{
+									background: @linkColor;
+								}
+								&.active{
+									background: @linkColor;
+								}
+						}
+				}
+		}
+		#previewSpinner{
+			position: absolute;
+			width: 50px;
+			height: 50px;
+			display: block;
+			top: 50%;
+			left: 50%;
+			margin-left: -25px;
+			margin-top: -25px;
+			border-radius: 25px;
+			z-index: 99;
+			background: url(images/spinner.gif) 50% 50% no-repeat @linkColor;
+		}
+}
