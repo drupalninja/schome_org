@@ -28,7 +28,11 @@
 
 			$('#filters .active').removeClass('active')
 			$('#filters li a[data-filter="'+selector+'"]').parent('li').addClass('active');
-			change_hash(selector)
+			change_hash(selector);
+
+			$(window).on("debouncedresize", function( event ) {
+				arrange();
+			});
 		});
 
 		function getNumColumns(){
@@ -77,10 +81,6 @@
 			setColumnWidth();
 			$container.isotope('reLayout');
 		}
-
-		$(window).on("debouncedresize", function( event ) {
-			arrange();
-		});
 
 		// Filter projects
 		$('.filter a').click(function(){
@@ -256,7 +256,12 @@
 				<?php } ?>
 
 				<?php if($folio_excerpt == "yes"){ ?>
-					<p class="excerpt"><?php $excerpt = get_the_excerpt(); echo my_string_limit_words($excerpt,$folio_excerpt_count);?></p>
+					<p class="excerpt">
+						<?php
+							$excerpt = get_the_excerpt();
+							echo wp_trim_words( $excerpt, $folio_excerpt_count );
+						?>
+					</p>
 				<?php } ?>
 
 				<?php if($folio_btn == "yes"){

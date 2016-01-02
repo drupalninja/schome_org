@@ -193,13 +193,27 @@
 								"id" => "g_breadcrumbs_id",
 								"type" => "radio",
 								"std" => "yes",
-								"options" => $yes_no_array);;
+								"options" => $yes_no_array);
 
 			$options['custom_css'] = array( "name" => theme_locals('css_name'),
 								"desc" => theme_locals('css_desc'),
 								"id" => "custom_css",
 								"std" => "",
 								"type" => "textarea");
+
+			$options['live_chat_id'] = array( "name" => theme_locals('live_chat_name'),
+					"desc"  => sprintf( theme_locals('live_chat_desc'), "<a href='http://www.olark.com/?r=ad8fbsj2'>Get own account ID.</a>" ),
+					"id"    => "live_chat_id",
+					"std"   => "",
+					"class" => "tiny",
+					"type"  => "text" );
+
+			$options['tm_live_chat'] = array( "name" => theme_locals('tm_live_chat_name'),
+					"desc"    => theme_locals('tm_live_chat_desc'),
+					"id"      => "tm_live_chat",
+					"type"    => "radio",
+					"std"     => "yes",
+					"options" => $yes_no_array );
 
 // ---------------------------------------------------------
 // Logo & Favicon
@@ -923,6 +937,25 @@
 								'options' => array(
 										'faces' => $typography_mixed_fonts )
 								);
+
+// ---------------------------------------------------------
+// Cookie Banner
+// ---------------------------------------------------------
+			$options['cookie_banner_h'] = array( "name" => theme_locals("cookie_banner_h"),
+								"type" => "heading");
+
+			$options['cookie_banner'] = array( "name" => theme_locals('cookie_banner_name'),
+								"desc" => theme_locals('cookie_banner_desc'),
+								"id" => "cookie_banner",
+								"type" => "radio",
+								"std" => "no",
+								"options" => $yes_no_array);
+
+			$options['cookie_banner_text'] = array( "name" => theme_locals('cookie_banner_text'),
+								"desc" => theme_locals('cookie_banner_text_desc'),
+								"id" => "cookie_banner_text",
+								"std" => theme_locals('cookie_banner_text_std'),
+								"type" => "textarea");
 
 			return $options;
 		}

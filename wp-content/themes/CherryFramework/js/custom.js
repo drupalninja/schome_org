@@ -1,22 +1,4 @@
 // ---------------------------------------------------------
-// Magnific Popup Init
-// ---------------------------------------------------------
-function magnific_popup_init(item) {
-	item.magnificPopup({
-		delegate: 'a[rel^="prettyPhoto"]',
-		type: 'image',
-		removalDelay: 500,
-		mainClass: 'mfp-zoom-in',
-		callbacks: {
-			beforeOpen: function() {
-				// just a hack that adds mfp-anim class to markup 
-				this.st.image.markup = this.st.image.markup.replace('mfp-figure', 'mfp-figure mfp-with-anim');
-			}
-		},
-		gallery: {enabled:true}
-	});
-}
-// ---------------------------------------------------------
 // !!!!!!!!!!!!!!!!!document ready!!!!!!!!!!!!!!!!!!!!!!!!!!
 // ---------------------------------------------------------
 jQuery(document).ready(function(){
@@ -25,15 +7,17 @@ jQuery(document).ready(function(){
 // ---------------------------------------------------------
 	if(jQuery('body.blog')[0]){
 		var isotope_holder = jQuery('.isotope');
-		isotope_holder.isotope({
-			itemSelector : '.post_wrapper',
-			hiddenClass : 'hidden',
-			resizable : true,
-			transformsEnabled : false,
-			layoutMode: 'masonry'
-		}).bind("resize.rainbows", function(){
-			isotope_holder.isotope('reLayout');
-		}).trigger("resize.rainbows").css({'visibility':'visible'});
+		isotope_holder.imagesLoaded( function() {
+			isotope_holder.isotope({
+				itemSelector : '.post_wrapper',
+				hiddenClass : 'hidden',
+				resizable : true,
+				transformsEnabled : false,
+				layoutMode: 'masonry'
+			}).bind("resize.rainbows", function(){
+				isotope_holder.isotope('reLayout');
+			}).trigger("resize.rainbows").css({'visibility':'visible'});
+		});
 	}
 // ---------------------------------------------------------
 // Call Magnific Popup
@@ -89,7 +73,7 @@ jQuery(document).ready(function(){
 							window.location.href = jQuery(this).attr("href");
 						}
 					);
-				} 
+				}
 			})
 		}
 	}
@@ -99,7 +83,7 @@ jQuery(document).ready(function(){
 	var MSIE8 = (jQuery.browser.msie) && (jQuery.browser.version == 8);
 	jQuery('img[data-src]').bind('load', img_load_complete);
 	jQuery(window).bind('resize', img_loader).bind('scroll', img_loader).trigger('scroll');
-	
+
 	function img_loader(){
 		var get_img = jQuery('img[data-src]').eq(0)
 		if(get_img[0]){
@@ -137,7 +121,7 @@ jQuery(document).ready(function(){
 			item_class='user_'+type,
 			count = parseInt(jQuery('.voting_count', item).text()),
 			top_position = (type==='like') ? -18 : 18 ,
-			mark = (type==='like') ? '+' : '-', 
+			mark = (type==='like') ? '+' : '-',
 			post_url = item.attr('href');
 
 		jQuery('.post_like>a, .post_dislike>a', item_parent).unbind('click', voitng).removeAttr('href date-type').removeClass('ajax_voting').addClass('user_voting');
@@ -165,36 +149,48 @@ jQuery(document).ready(function(){
 // ---------------------------------------------------------
 // Contact form notvalid tip fadeOut
 // ---------------------------------------------------------
-jQuery(function() {
-  // clear cf7 error msg on mouseover
-	jQuery(".wpcf7-form-control-wrap").on("mouseover", function(){
-		jQuery("span.wpcf7-not-valid-tip", this).fadeOut();
+	jQuery(function() {
+		// clear cf7 error msg on mouseover
+		jQuery(".wpcf7-form-control-wrap").on("mouseover", function(){
+			jQuery("span.wpcf7-not-valid-tip", this).fadeOut();
+		});
+	});
+// ---------------------------------------------------------
+// Cookie Banner
+// ---------------------------------------------------------
+	jQuery('#cf-cookie-banner .close').click(function() {
+		createCookie('cf-cookie-banner', 1, 365);
 	});
 });
 // ---------------------------------------------------------
-// OWL Carousel init
+// Magnific Popup Init
 // ---------------------------------------------------------
-	jQuery('div[id^="owl-carousel-"]').each(function(){
-		var carousel = jQuery(this),
-			auto_play = parseInt(carousel.attr('data-auto-play'))<1 ? false : parseInt(carousel.attr('data-auto-play')),
-			items_count = parseInt(carousel.attr('data-items')),
-			disolay_navs = carousel.attr('data-nav')=='true' ? true : false,
-			disolay_pagination = carousel.attr('data-pagination')=='true' ? true : false,
-			auto_height = items_count<=1 ? true : false;
-
-		jQuery(carousel).owlCarousel({
-			autoPlay: auto_play,
-			items: items_count,
-			navigation : disolay_navs,
-			pagination : disolay_pagination,
-			navigationText:false,
-			autoHeight:auto_height,
-			itemsDesktop:[1170, 5],
-			itemsDesktopSmall:[980, 4],
-			itemsTablet:[768, 3],
-			itemsMobile:[480, 2]
-		});
-	})
-	jQuery('.owl-prev').addClass('icon-chevron-left');
-	jQuery('.owl-next').addClass('icon-chevron-right');
-});
+function magnific_popup_init(item) {
+	item.magnificPopup({
+		delegate: 'a[rel^="prettyPhoto"]',
+		type: 'image',
+		removalDelay: 500,
+		mainClass: 'mfp-zoom-in',
+		callbacks: {
+			beforeOpen: function() {
+				// just a hack that adds mfp-anim class to markup
+				this.st.image.markup = this.st.image.markup.replace('mfp-figure', 'mfp-figure mfp-with-anim');
+			}
+		},
+		gallery: {enabled:true}
+	});
+}
+// ---------------------------------------------------------
+// Cookie utilities
+// ---------------------------------------------------------
+function createCookie(name, value, days) {
+	if (days) {
+		var date = new Date();
+		date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+		var expires = "; expires=" + date.toGMTString()
+	} else var expires = "";
+	document.cookie = name + "=" + value + expires + "; path=/"
+}
+function deleteCookie(name) {
+	createCookie( name, "", { expires: -1 } );
+}

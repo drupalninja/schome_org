@@ -197,7 +197,7 @@
 		return icl_translate( 'cherry', $name, $value );
 	}
 	//Check if WPML is activated
-	if ( defined( 'ICL_SITEPRESS_VERSION' ) ) {
+	if ( function_exists( 'icl_translate' ) ) {
 		add_filter( 'cherry_text_translate', 'cherry_wpml_translate_filter', 10, 2 );
 	}
 
@@ -255,6 +255,18 @@
 		include_once (PARENT_DIR .'/includes/lessc.inc.php');
 	}
 	include_once (PARENT_DIR .'/includes/less-compile.php');
+
+	// Olark Live Chat.
+	if ( is_child_theme() && file_exists( CHILD_DIR . '/includes/live-chat.php' ) ) {
+		include_once ( CHILD_DIR . '/includes/live-chat.php' );
+	} else {
+		include_once ( PARENT_DIR . '/includes/live-chat.php' );
+	}
+
+	// TM Live Chat.
+	if ( 'yes' == of_get_option( 'tm_live_chat', 'yes' ) ) {
+		include_once ( PARENT_DIR . '/includes/tm-chat/class-cherry-tm-chat.php' );
+	}
 
 	// removes detailed login error information for security
 	add_filter('login_errors',create_function('$a', "return null;"));
@@ -424,10 +436,44 @@
 
 				$output .= $indent . '<li id="menu-item-'. $item->ID . '"' . $value . $class_names .'>';
 
-				$attributes  = ! empty( $item->attr_title ) ? ' title="'  . esc_attr( $item->attr_title ) .'"' : '';
-				$attributes .= ! empty( $item->target )     ? ' target="' . esc_attr( $item->target     ) .'"' : '';
-				$attributes .= ! empty( $item->xfn )        ? ' rel="'    . esc_attr( $item->xfn        ) .'"' : '';
-				$attributes .= ! empty( $item->url )        ? ' href="'   . esc_attr( $item->url        ) .'"' : '';
+				// $attributes  = ! empty( $item->attr_title ) ? ' title="'  . esc_attr( $item->attr_title ) .'"' : '';
+				// $attributes .= ! empty( $item->target )     ? ' target="' . esc_attr( $item->target     ) .'"' : '';
+				// $attributes .= ! empty( $item->xfn )        ? ' rel="'    . esc_attr( $item->xfn        ) .'"' : '';
+				// $attributes .= ! empty( $item->url )        ? ' href="'   . esc_attr( $item->url        ) .'"' : '';
+
+				$atts = array();
+				$atts['title']  = ! empty( $item->attr_title ) ? $item->attr_title : '';
+				$atts['target'] = ! empty( $item->target )     ? $item->target     : '';
+				$atts['rel']    = ! empty( $item->xfn )        ? $item->xfn        : '';
+				$atts['href']   = ! empty( $item->url )        ? $item->url        : '';
+
+				/**
+				 * Filter the HTML attributes applied to a menu item's <a>.
+				 *
+				 * @since 3.6.0
+				 *
+				 * @see wp_nav_menu()
+				 *
+				 * @param array $atts {
+				 *     The HTML attributes applied to the menu item's <a>, empty strings are ignored.
+				 *
+				 *     @type string $title  Title attribute.
+				 *     @type string $target Target attribute.
+				 *     @type string $rel    The rel attribute.
+				 *     @type string $href   The href attribute.
+				 * }
+				 * @param object $item The current menu item.
+				 * @param array  $args An array of wp_nav_menu() arguments.
+				 */
+				$atts = apply_filters( 'nav_menu_link_attributes', $atts, $item, $args );
+
+				$attributes = '';
+				foreach ( $atts as $attr => $value ) {
+					if ( ! empty( $value ) ) {
+						$value = ( 'href' === $attr ) ? esc_url( $value ) : esc_attr( $value );
+						$attributes .= ' ' . $attr . '="' . $value . '"';
+					}
+				}
 
 				$description  = ! empty( $item->description ) ? '<span class="desc">'.esc_attr( $item->description ).'</span>' : '';
 
@@ -1238,48 +1284,58 @@
 //------------------------------------------------------
 //  Get team social networks
 //------------------------------------------------------
-	function cherry_get_post_networks($args = array()){
-		global $post;
-		extract(
-			wp_parse_args(
-				$args,
-				array(
-					'post_id' => get_the_ID(),
-					'class' => 'post_networks',
-					'before_title' => '<h4>',
-					'after_title' => '</h4>',
-					'display_title' => true,
-					'output_type' => 'echo'
-				)
-			)
-		);
-		$networks_array = explode(" ", get_option('fields_id_value'.$post_id, ''));
+function cherry_get_post_networks( $args = array() ) {
+	global $post;
+	extract( wp_parse_args( $args, apply_filters( 'cherry_get_post_networks_args', array(
+				'post_id'       => get_the_ID(),
+				'class'         => 'post_networks',
+				'before_title'  => '<h4>',
+				'after_title'   => '</h4>',
+				'display_title' => true,
+				'output_type'   => 'echo',
+			) )
+		)
+	);
 
-		if($networks_array[0]!=''){
-			$count = 0;
-			$network_title = get_post_meta($post_id, 'network_title', true);
+	$output         = '';
+	$fields_id      = get_post_meta( $post_id, 'fields_id', true );
+	$networks_title = get_post_meta( $post_id, 'networks_title', true );
+	$network_icons  = get_post_meta( $post_id, 'network_icon', true );
+	$network_titles = get_post_meta( $post_id, 'network_title', true );
+	$network_urls   = get_post_meta( $post_id, 'network_url', true );
 
-			$output = '<div class="'.$class.'">';
-			$output .= $network_title && $display_title ? $before_title.$network_title.$after_title : '';
-			$output .= '<ul class="clearfix unstyled">';
-			foreach ($networks_array as $networks_id) {
-				$network_array = explode(";", get_option('network_'.$post_id.'_'.$networks_id, array('','','')));
-				$output .= '<li class="network_'.$count.'">';
-				$output .= $network_array[2] ? '<a href="'.$network_array[2].'" title="'.$network_array[1].'">' : '' ;
-				$output .= $network_array[0] ? '<span class="'.$network_array[0].'"></span>' :'';
-				$output .= $network_array[1] ? '<span class="network_title">'.$network_array[1].'</span>' : '' ;
-				$output .= $network_array[2] ? '</a>' : '' ;
-				$output .= '</li>';
-				++$count;
-			}
-			$output .= '</ul></div>';
-			if($output_type == 'echo'){
-				echo $output;
-			}else{
-				return $output;
-			}
-		}
+	if ( empty( $fields_id ) || !is_array( $fields_id ) ) {
+		return $output;
 	}
+
+	$output .= '<div class="'.$class.'">';
+	$output .= $networks_title && $display_title ? $before_title . $networks_title . $after_title : '';
+	$output .= '<ul class="clearfix unstyled">';
+
+	foreach ( $fields_id as $key => $value ) {
+
+		$icon  = ( isset( $network_icons[ $value ] ) ) ? $network_icons[ $value ] : '';
+		$title = ( isset( $network_titles[ $value ] ) ) ? $network_titles[ $value ] : '';
+		$url   = ( isset( $network_urls[ $value ] ) ) ? $network_urls[ $value ] : '';
+
+		$output .= '<li class="network_'.$key.'">';
+			$output .= $url ? '<a href="'.esc_url( $url ).'" title="'.esc_attr( $title ).'">' : '' ;
+			$output .= $icon ? '<span class="'.esc_attr( $icon ).'"></span>' :'';
+			$output .= $title ? '<span class="network_title">'.$title.'</span>' : '' ;
+			$output .= $url ? '</a>' : '' ;
+		$output .= '</li>';
+	}
+
+	$output .= '</ul></div>';
+
+	$output = apply_filters( 'cherry_get_post_networks_html', $output );
+
+	if ( $output_type == 'echo' ) {
+		echo $output;
+	} else {
+		return $output;
+	}
+}
 //------------------------------------------------------
 //  Related Posts
 //------------------------------------------------------
@@ -1602,5 +1658,46 @@
 
 			return $layout_class;
 		}
+	}
+
+	/**
+	 * Cookie Banner option.
+	 */
+	add_action( 'wp_footer', 'cherry_cookie_banner', 999 );
+	function cherry_cookie_banner() {
+		$is_banner_visibility = of_get_option( 'cookie_banner', false );
+		$banner_text          = trim( of_get_option( 'cookie_banner_text', '' ) );
+		$banner_dismiss       = false;
+
+		if ( 'yes' != $is_banner_visibility ) { ?>
+			<script type="text/javascript">
+				deleteCookie('cf-cookie-banner');
+			</script>
+			<?php return;
+		}
+
+		if ( empty( $banner_text ) ) {
+			return;
+		}
+
+		if ( isset( $_COOKIE['cf-cookie-banner'] ) && '1' == $_COOKIE['cf-cookie-banner'] ) {
+			return;
+		}
+
+		ob_start(); ?>
+
+		<div id="cf-cookie-banner" class="cf-cookie-banner-wrap alert fade in">
+			<div class="container">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+				<?php echo htmlspecialchars_decode( $banner_text ); ?>
+			</div>
+		</div>
+
+		<?php $output = ob_get_contents();
+		ob_end_clean();
+
+		$output = apply_filters( 'cherry_cookie_banner', $output );
+
+		printf( '%s', $output );
 	}
 ?>

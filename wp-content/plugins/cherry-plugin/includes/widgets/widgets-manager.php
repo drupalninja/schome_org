@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  *
  * Create widget showing manager
@@ -69,7 +69,7 @@ function clean_rules() {
 
 	// get all widgets names
 	$all_widgets = array();
-	$all_widgets_assoc = get_option('sidebars_widgets'); 
+	$all_widgets_assoc = get_option('sidebars_widgets');
 	// iterate throug the sidebar widgets settings to get all active widgets names
 	foreach($all_widgets_assoc as $sidebar_name => $sidebar) {
 		// remember about wp_inactive_widgets and array_version fields!
@@ -268,16 +268,16 @@ function cherry_dynamic_sidebar_params( $params ) {
 	$responsive   = get_option($themename . '_widget_responsive');
 	$custom_class = get_option($themename . '_widget_custom_class');
 
-	if ( !isset($responsive[$widget_id]) && !isset($custom_class[$widget_id]) ) 
+	if ( !isset($responsive[$widget_id]) && !isset($custom_class[$widget_id]) )
 		return $params;
 
 	$haystack_str = htmlspecialchars(stripslashes($params[0]['before_widget']), ENT_QUOTES);
 	$params[0]['before_widget'] = add_widget_class_attr($haystack_str);
 
-	if ( isset($custom_class[$widget_id]) && !empty($custom_class[$widget_id]) ) 
+	if ( isset($custom_class[$widget_id]) && !empty($custom_class[$widget_id]) )
 		$params[0]['before_widget'] = preg_replace( '/class="/', "class=\"{$custom_class[$widget_id]} ", $params[0]['before_widget'], 1 );
 
-	if ( isset($responsive[$widget_id]) && !empty($responsive[$widget_id]) ) 
+	if ( isset($responsive[$widget_id]) && !empty($responsive[$widget_id]) )
 	$params[0]['before_widget'] = preg_replace( '/class="/', "class=\"{$responsive[$widget_id]} ", $params[0]['before_widget'], 1 );
 
 	return $params;
@@ -299,7 +299,7 @@ function add_widget_class_attr($haystack_str) {
 
 add_action( 'sidebar_admin_setup', 'cherry_add_widget_control');
 function cherry_add_widget_control() {
-	global $wp_registered_widgets; 
+	global $wp_registered_widgets;
 	global $wp_registered_widget_controls;
 
 	$themename = 'cherry';
@@ -364,7 +364,7 @@ function cherry_add_widget_control() {
 	}
 }
 
-// function to add the widget control 
+// function to add the widget control
 function cherry_widget_control() {
 	// get the access to the registered widget controls
 	global $wp_registered_widget_controls;
@@ -453,7 +453,7 @@ function cherry_widget_control() {
 	$responsiveMode = !empty($responsive[$id]) ? htmlspecialchars(stripslashes($responsive[$id]),ENT_QUOTES) : '';
 	$usersMode      = !empty($users[$id]) ? htmlspecialchars(stripslashes($users[$id]),ENT_QUOTES) : '';
 
-	// 
+	//
 	// output the custom CSS class field
 	echo '<p class="custom_class"><label for="' . $themename . '_widget_custom_class_'.$id.'">'.__('Custom CSS class', CHERRY_PLUGIN_DOMAIN).': <input type="text" class="widefat" name="' . $themename . '_widget_custom_class_'.$id.'"  id="' . $themename . '_widget_custom_class_'.$id.'" value="'.$c_class.'" /></label></p>';
 	echo '
@@ -471,6 +471,7 @@ function cherry_widget_control() {
 			<legend>'.__('Select page to add', CHERRY_PLUGIN_DOMAIN).'</legend>
 			<select class="widefat gk_widget_rules_form_select">
 				<option value="homepage">'.__('Homepage', CHERRY_PLUGIN_DOMAIN).'</option>
+				<option value="blog">'.__('Blog', CHERRY_PLUGIN_DOMAIN).'</option>
 				<option value="page:">'.__('Page', CHERRY_PLUGIN_DOMAIN).'</option>
 				<option value="post:">'.__('Post', CHERRY_PLUGIN_DOMAIN).'</option>
 				<option value="category:">'.__('Archive', CHERRY_PLUGIN_DOMAIN).'</option>
@@ -581,7 +582,7 @@ function check_widget_visibility($id) {
 	if ( (!isset($options[$id]) || $options[$id] == '') && (!isset($users[$id]) || $users[$id] == '') || $conditional_result === TRUE ) {
 		// return TRUE, because at lease one widget exists in the specific sidebar
 		$sidebar_flag = true;
-	} 
+	}
 	// set the state of the widget
 	$wp_registered_widgets[$id]['cherrystate'] = $conditional_result;
 
@@ -602,9 +603,8 @@ function check_widget_visibility($id) {
 function cherry_condition($mode, $input, $users) {
 	// Example input:
 	// homepage,page:12,post:10,category:test,tag:test
-
 	$mode_output = '';
-	
+
 	if ( !empty($input) ) :
 		$mode_output = ' (';
 		if ( $mode == 'all' ) {
@@ -613,18 +613,20 @@ function cherry_condition($mode, $input, $users) {
 		} else if (( $mode == 'exclude' )) {
 			$mode_output = ' !(';
 		}
-		
+
 		if($mode != 'all') {
 			$input = substr($input, 1);
 			$input = explode(',', $input);
-			
+
 			for($i = 0; $i < count($input); $i++) {
 				if($i > 0) {
-					$mode_output .= '||'; 
+					$mode_output .= '||';
 				}
-				
+
 				if(stripos($input[$i], 'homepage') !== FALSE) {
 					$mode_output .= ' is_front_page() ';
+				} else if(stripos($input[$i], 'blog') !== FALSE) {
+					$mode_output .= ' is_home() ';
 				} else if(stripos($input[$i], 'page:') !== FALSE) {
 					$mode_output .= ' is_page(\'' . substr($input[$i], 5) . '\') ';
 				} else if(stripos($input[$i], 'post:') !== FALSE) {
@@ -665,7 +667,7 @@ function cherry_condition($mode, $input, $users) {
 	}
 
 	$output = $mode_output . (($users_output == '') ? '' : $operator . $users_output );
-	
+
 	if ( $output == '' )
 		$output = ' TRUE';
 

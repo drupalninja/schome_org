@@ -10,7 +10,7 @@
 			wp_enqueue_style( 'flexslider' );
 			wp_enqueue_style( 'owl-carousel', CHERRY_PLUGIN_URL . 'lib/js/owl-carousel/owl.carousel.css', false, '1.24', 'all' );
 			wp_enqueue_style( 'owl-theme', CHERRY_PLUGIN_URL . 'lib/js/owl-carousel/owl.theme.css', false, '1.24', 'all' );
-			wp_enqueue_style( 'font-awesome', 'http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css', false, '3.2.1', 'all' );
+			wp_enqueue_style( 'font-awesome', '//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css', false, '3.2.1', 'all' );
 
 			if ( is_rtl() ) {
 				wp_enqueue_style( 'cherry-plugin', CHERRY_PLUGIN_URL . 'includes/css/cherry-plugin-rtl.css', false, CHERRY_PLUGIN_VERSION, 'all' );
@@ -40,6 +40,21 @@
 			wp_enqueue_script( 'googlemapapis' );
 
 			wp_enqueue_script( 'cherry-plugin', CHERRY_PLUGIN_URL . 'includes/js/cherry-plugin.js', array('jquery'), CHERRY_PLUGIN_VERSION, true );
+
+			/**
+			 * Filters a custom variations of a OWL-carousel items.
+			 *
+			 * @since 1.2.6
+			 * @param array $items_custom
+			 */
+			$items_custom = apply_filters( 'cherry_plugin_owl_items_custom', array(
+					array( 0, 1 ),
+					array( 480, 2 ),
+					array( 768, 3 ),
+					array( 980, 4 ),
+					array( 1170, 5 ),
+				) );
+			wp_localize_script( 'cherry-plugin', 'items_custom', $items_custom );
 		}
-		add_action( 'wp_enqueue_scripts', 'cherry_include_script' );
+		add_action( 'wp_enqueue_scripts', 'cherry_include_script', 9 );
 	}

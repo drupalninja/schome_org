@@ -1,13 +1,13 @@
 (function($){
-	$.fn.tmStickUp=function(options){ 
-		
+	$.fn.tmStickUp=function(options){
+
 		var getOptions = {
 			correctionSelector: $('.correctionSelector')
 		,	listenSelector: $('.listenSelector')
 		,	active: false
 		,	pseudo: true
 		}
-		$.extend(getOptions, options); 
+		$.extend(getOptions, options);
 
 		var
 			_this = $(this)
@@ -24,7 +24,10 @@
 		,	tmpScrolled
 		;
 
-		init();
+		if (_this.length != 0) {
+			init();
+		}
+
 		function init(){
 			thisOffsetTop = parseInt(_this.offset().top);
 			thisMarginTop = parseInt(_this.css("margin-top"));
@@ -78,6 +81,14 @@
 					}
 				}
 			}).trigger('scroll');
+
+			_document.on("resize", function() {
+				if(_this.hasClass('isStuck')){
+					if( thisOffsetTop != parseInt(pseudoBlock.offset().top) ) thisOffsetTop = parseInt(pseudoBlock.offset().top);
+				} else {
+					if( thisOffsetTop != parseInt(_this.offset().top) ) thisOffsetTop = parseInt(_this.offset().top);
+				}
+			})
 		}
 	}//end tmStickUp function
 })(jQuery)

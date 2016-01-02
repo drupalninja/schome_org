@@ -6,7 +6,11 @@
 	add_action('wp_ajax_export_content', 'cherry_plugin_export_content');
 	function cherry_plugin_export_content() {
 		$exclude_files = array('xml', 'json');
-		$exclude_folder = array('woocommerce_uploads');
+		/**
+		 * Filters folders to exclude from export parser
+		 * @var array
+		 */
+		$exclude_folder = apply_filters( 'cherry_export_exclude_folders', array( 'woocommerce_uploads', 'wc-logs' ) );
 		$response = array(
 			'what'=>'status',
 			'action'=>'export_content',
@@ -47,10 +51,14 @@
 			cherry_plugin_delete_file($xml_file);
 		}
 
+		$nonce = wp_create_nonce( 'cherry_plugin_download_content' );
+
+		$file_url = add_query_arg( array( 'action' => 'cherry_plugin_get_export_file', 'file' => $zip_name, '_wpnonce' => $nonce ), admin_url( 'admin-ajax.php' ) );
+
 		if ($result == 0) {
 			$response['data'] = "Error : ".$zip->errorInfo(true);
 		}else{
-			$response_file['data'] = $zip_name;
+			$response_file['data'] = $file_url;
 		}
 
 		$xmlResponse = new WP_Ajax_Response($response);
@@ -143,7 +151,7 @@
 
 		return $json_dir;
 	}
-	function sort_widget_array($array){ 
+	function sort_widget_array($array){
 		return (!empty($array) && is_array($array));
 	}
 	function cherry_plugin_delete_file($file){

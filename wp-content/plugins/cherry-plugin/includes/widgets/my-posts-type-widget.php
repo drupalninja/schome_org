@@ -6,7 +6,7 @@ class MY_PostsTypeWidget extends WP_Widget {
 function MY_PostsTypeWidget() {
 	$widget_ops = array('classname' => 'my_posts_type_widget', 'description' => __('Show custom posts', CHERRY_PLUGIN_DOMAIN));
 	$control_ops = array('width' => 510, 'height' => 350);
-	parent::WP_Widget(false, __('Cherry - Advanced Cycle', CHERRY_PLUGIN_DOMAIN), $widget_ops, $control_ops);
+	parent::__construct( false, $name = __( 'Cherry - Advanced Cycle', CHERRY_PLUGIN_DOMAIN ), $widget_ops, $control_ops );
 }
 
 /**
@@ -136,7 +136,7 @@ function widget($args, $instance) {
 		  <?php if ( $instance['excerpt_as_link'] ) : ?>
 				<a href="<?php the_permalink() ?>">
 			  <?php endif; ?>
-			<?php $excerpt = get_the_excerpt(); echo my_string_limit_words($excerpt,$limittext);?>
+			<?php $excerpt = get_the_excerpt(); echo wp_trim_words($excerpt,$limittext);?>
 		  <?php if ( $instance['excerpt_as_link'] ) : ?>
 				</a>
 			  <?php endif; ?>

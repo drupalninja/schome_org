@@ -8,6 +8,7 @@ if (!function_exists('shortcode_recent_posts')) {
 				'category'         => '',
 				'custom_category'  => '',
 				'tag'              => '',
+				'custom_tag'       => '',
 				'post_format'      => 'standard',
 				'num'              => '5',
 				'meta'             => 'true',
@@ -16,7 +17,7 @@ if (!function_exists('shortcode_recent_posts')) {
 				'thumb_height'     => '120',
 				'more_text_single' => '',
 				'excerpt_count'    => '0',
-				'custom_class'     => ''
+				'custom_class'     => '',
 		), $atts));
 
 		$output = '<ul class="recent-posts '.$custom_class.' unstyled">';
@@ -34,6 +35,7 @@ if (!function_exists('shortcode_recent_posts')) {
 						'category_name'     => $category,
 						'tag'               => $tag,
 						$type . '_category' => $custom_category,
+						$type . '_tag'      => $custom_tag,
 						'numberposts'       => $num,
 						'orderby'           => 'post_date',
 						'order'             => 'DESC',
@@ -400,7 +402,7 @@ if (!function_exists('shortcode_recent_posts')) {
 
 					if($excerpt_count >= 1){
 						$output .= '<div class="excerpt">';
-							$output .= my_string_limit_words($excerpt,$excerpt_count);
+							$output .= wp_trim_words($excerpt,$excerpt_count);
 						$output .= '</div>';
 				}
 
@@ -432,7 +434,7 @@ if (!function_exists('shortcode_recent_posts')) {
 					$output .= cherry_get_post_networks(array('post_id' => $post->ID, 'display_title' => false, 'output_type' => 'return'));
 					if ($excerpt_count >= 1) {
 						$output .= '<div class="excerpt">';
-							$output .= my_string_limit_words($excerpt,$excerpt_count);
+							$output .= wp_trim_words($excerpt,$excerpt_count);
 						$output .= '</div>';
 					}
 					if ($more_text_single!="") {
@@ -521,7 +523,9 @@ if (!function_exists('shortcode_recenttesti')) {
 		extract(shortcode_atts(array(
 				'num'           => '5',
 				'thumb'         => 'true',
+				'text'          => 'part', // part|full
 				'excerpt_count' => '30',
+				'linked'        => 'true', // true|false
 				'custom_class'  => '',
 		), $atts));
 
@@ -582,11 +586,21 @@ if (!function_exists('shortcode_recenttesti')) {
 							$output .= '</figure>';
 						}
 					}
-					$output .= '<a href="'.get_permalink( $post_id ).'">';
-						$output .= my_string_limit_words($excerpt,$excerpt_count);
-					$output .= '</a><div class="clear"></div>';
 
-				$output .= '</blockquote>';
+					if ( 'full' == $text ) {
+						$_content = apply_filters( 'the_content', get_the_content( '' ) );
+					} else {
+						$_content = wp_trim_words( $excerpt, $excerpt_count, apply_filters( 'cherry_plugin_shortcode_excerpt_more', '', $atts, 'recenttesti' ) );
+					}
+
+					$text_wrap = '<a href="%2$s">%1$s</a>';
+					if ( 'false' == $linked ) {
+						$text_wrap = '%1$s';
+					}
+
+					$output .= sprintf( $text_wrap, $_content, esc_url( get_permalink( $post_id ) ) );
+
+				$output .= '<div class="clear"></div></blockquote>';
 
 				$output .= '<small class="testi-meta">';
 					if ( !empty( $testiname ) ) {
@@ -653,22 +667,37 @@ if (!function_exists('shortcode_tags')) {
 //video preview
 if (!function_exists('shortcode_video_preview')) {
 	function shortcode_video_preview( $atts, $content = null, $shortcodename = '' ) {
-		extract(shortcode_atts(
-			array(
-				'title' => '',
-				'post_url' => '',
-				'date' => '',
-				'author' => '',
+		extract( shortcode_atts( array(
+				'title'        => '',
+				'post_url'     => '',
+				'date'         => '',
+				'author'       => '',
+				'lightbox'     => 'no',
 				'custom_class' => '',
-			), $atts));
-		$output_title = '';
-		$output_author = '';
-		$output_date = '';
-		$post_ID = url_to_postid($post_url);
-		$get_post = get_post($post_ID);
-		$get_user = get_userdata($get_post->post_author);
-		$user_url = get_bloginfo('url').'/author/'.$get_user->user_nicename;
-		$video_url = parser_video_url(get_post_meta($post_ID, 'tz_video_embed', true));
+			), $atts ) );
+
+		$output_title    = '';
+		$output_author   = '';
+		$output_date     = '';
+		$post_ID         = url_to_postid( $post_url);
+		$get_post        = get_post($post_ID);
+		$get_user        = get_userdata($get_post->post_author);
+		$user_url        = get_bloginfo('url').'/author/'.$get_user->user_nicename;
+
+		$video_embed_meta = get_post_meta( $post_ID, 'tz_video_embed', true );
+
+		if ( empty( $video_embed_meta ) ) {
+			return '';
+		}
+
+		$video_url       = parser_video_url( $video_embed_meta );
+		$video_url_popup = str_replace('src=', '', $video_url);
+		$rand            = rand();
+
+		if(strpos($video_url, 'youtube') !== false) {
+			$video_url_popup = str_replace('embed/', 'watch?v=', $video_url_popup);
+		}
+
 		$get_image_url = video_image($video_url);
 		$img='';
 
@@ -682,7 +711,22 @@ if (!function_exists('shortcode_video_preview')) {
 			$output_date = '<span class="post_date"><time datetime="'.$get_post->post_date.'"> '.get_the_date().'</time></span>';
 		}
 		if($get_image_url!=false && $get_image_url!=''){
-			$img = '<a class="preview_image"  href="'.$post_url.'" title="'.$get_image_url.'"><img src="'.$get_image_url.'" alt=""><span class="icon-play-circle hover"></span></a>';
+			if($lightbox == 'yes') {
+				$img = ' <script type="text/javascript">
+					jQuery(document).ready(function() {
+						jQuery(\'.popup-video-'.$rand.'\').magnificPopup({
+							type: \'iframe\',
+							mainClass: \'mfp-fade\',
+							removalDelay: 160,
+							preloader: false,
+							fixedContentPos: false
+						});
+					});
+				</script>';
+				$img .= '<a class="popup-video-'.$rand.'" href="'.$video_url_popup.'" title="'.$get_image_url.'"><img src="'.$get_image_url.'" alt=""><span class="icon-play-circle hover"></span></a>';
+			} else {
+				$img = '<a class="preview_image"  href="'.$post_url.'" title="'.$get_image_url.'"><img src="'.$get_image_url.'" alt=""><span class="icon-play-circle hover"></span></a>';
+			}
 		}
 		$output ='<figure class="featured-thumbnail thumbnail video_preview clearfix'.$custom_class.'"><div>'.$img.'<figcaption>'.$output_title.$output_author.$output_date.'</figcaption></div></figure>';
 
@@ -698,10 +742,13 @@ if ( !function_exists( 'content_box_shortcode' ) ) {
 	function content_box_shortcode( $atts, $content = null, $shortcodename = '' ) {
 		extract( shortcode_atts(
 			array(
+				'full_width' => 'no',
 				'custom_class' => '',
 		), $atts ) );
 
-		$output = '<div class="content_box ' . $custom_class . '">';
+		$full_width = ( $full_width == 'yes' ) ? 'full-width' : '';
+
+		$output = '<div class="content_box ' . $custom_class . ' ' . $full_width . '">';
 			$output .= do_shortcode( $content );
 			$output .= '<div class="clear"></div>';
 		$output .= '</div><!-- .content_box (end) -->';
